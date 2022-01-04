@@ -11,11 +11,11 @@ defmodule Joke do
   end
 
   def print_joke(body) do
-    output=
+
       body
       |> Jason.decode!()
       |> Map.values()
       |> Enum.map(fn x-> IO.puts(x) end)
-    output
+
   end
 end
