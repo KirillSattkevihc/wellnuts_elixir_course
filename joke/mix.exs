@@ -23,7 +23,7 @@ defmodule Joke.MixProject do
     [
       {:jason, github: "michalmuskala/jason"},
       {:httpoison, github: "edgurgel/httpoison"},
-      {:floki, "~> 0.32.0"}
+      #{:floki, "~> 0.32.0"}
 
     ]
   end
