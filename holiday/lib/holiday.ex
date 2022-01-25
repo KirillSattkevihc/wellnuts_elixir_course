@@ -14,7 +14,7 @@ defmodule Holiday do
 
   @spec init_db() :: list()
   def init_db() do
-    db = File.read!("us-california-nonworkingdays.ics") |> ICalendar.from_ics()
+    File.read!("us-california-nonworkingdays.ics") |> ICalendar.from_ics()
   end
 
   @doc """
@@ -53,6 +53,7 @@ defmodule Holiday do
       29.34835648148148
 
   """
+  @unit_w %{day: 3600 * 24, hour: 3600, minute: 60, second: 1}
   @spec time_until_holiday(list(), atom(), Calendar.datetime()) :: float()
   def time_until_holiday(db, unit, now \\ DateTime.utc_now()) do
     if is_holiday(db, DateTime.to_date(now)) == true do
@@ -72,19 +73,12 @@ defmodule Holiday do
           end
         end)
 
-      unit_w = %{
-        day: 3600 * 24,
-        hour: 3600,
-        minute: 60,
-        second: 1
-      }
-
       time_until_holiday =
         db_now
         |> Enum.map(fn x -> DateTime.diff(x, now) end)
         |> Enum.min()
 
-      result = time_until_holiday / Map.get(unit_w, unit)
+      time_until_holiday / Map.get(@unit_w, :day)
     end
   end
 end
