@@ -14,10 +14,10 @@ defmodule Holiday do
 
   """
 
-  @spec init_db() :: list()
+  @spec init_db() :: :ok
   def init_db() do
     Holiday.Repo.delete_all(Holidays)
-    db = File.read!("us-california-nonworkingdays.ics")
+    File.read!("us-california-nonworkingdays.ics")
     |> ICalendar.from_ics()
     |> Stream.map(fn x-> %{name: x.summary,date: Date.new!(Date.utc_today.year, x.dtstart.month, x.dtstart.day)} end)
     |> Enum.each(fn x-> Ecto.Changeset.change(%Holiday.Holidays{},%{name: x.name, holiday_date: x.date})|> Holiday.Repo.insert() end )
@@ -30,15 +30,14 @@ defmodule Holiday do
 
   ## Examples
     iex> Holiday.init_db
-    iex> Holiday.is_holiday(~U[2020-04-25 15:38:22Z])
+    iex> Holiday.is_holiday(~U[2022-04-25 15:38:22Z])
     false
 
   """
 
   @spec is_holiday( Calendar.datetime()) :: boolean()
   def is_holiday( day \\ Date.utc_today()) do
-    q= from(x in Holidays, select: x.holiday_date)|>Repo.all()
-    Enum.any?(q, fn x -> x==day end)
+    from(x in Holidays, where: x.holiday_date== ^day, select: x.holiday_date)|>Repo.exists?()
   end
 
   @doc """
@@ -58,7 +57,7 @@ defmodule Holiday do
       29.34835648148148
 
   """
-
+  @unit_w %{day: 3600 * 24, hour: 3600,  minute: 60, second: 1}
   @spec time_until_holiday(atom(), Calendar.datetime()) :: float()
   def time_until_holiday(unit, now \\ DateTime.utc_now()) do
     if is_holiday(DateTime.to_date(now)) == true do
@@ -69,15 +68,7 @@ defmodule Holiday do
       |> NaiveDateTime.new!(~T[00:00:00])
       |> DateTime.from_naive!("Etc/UTC")
 
-      unit_w = %{
-        day: 3600 * 24,
-        hour: 3600,
-        minute: 60,
-        second: 1
-      }
-
-      time_until_holiday= DateTime.diff(holiday, now)
-      result= time_until_holiday/Map.get(unit_w, unit)
+      DateTime.diff(holiday, now)/Map.get(@unit_w, unit)
     end
   end
 end
