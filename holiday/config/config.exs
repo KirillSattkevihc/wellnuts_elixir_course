@@ -6,6 +6,4 @@ config :holiday, Holiday.Repo,
   password: "123",
   hostname: "localhost"
 
-
-
 config :holiday, ecto_repos: [Holiday.Repo]

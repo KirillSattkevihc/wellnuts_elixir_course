@@ -3,7 +3,7 @@ defmodule Holiday.Application do
 
   def start(_type, _args) do
     children = [
-      Holiday.Repo,
+      Holiday.Repo
     ]
 
     opts = [strategy: :one_for_one, name: Holiday.Supervisor]
