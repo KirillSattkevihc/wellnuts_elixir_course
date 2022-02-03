@@ -1,0 +1,7 @@
+<h1><%= form_for @conn, Routes.page_path(@conn, :login),
+[as: :password], fn f-> %>
+
+<%= text_input f, :pass, class: "form-control" %></h1>
+
+<%= submit "log-in", class: "btn btn-primary blue" %>
+<% end %>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EventPlaning · Phoenix Framework</title>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </head>
+  <body>
+
+  <nav>
+    <div class="nav-wrapper">
+      <a href="<%= Routes.page_path(@conn, :index)%>" class="brand-logo">Event Planing</a>
+      <h4 class="right"><%= if @conn.assigns[:password] do %>
+      <%= link "logout", to: Routes.page_path(@conn, :logout, class: "btn btn-primary blue") %>
+      <% else %>
+      <%= link "login", to: Routes.page_path(@conn, :login, class: "btn btn-primary blue") %>
+      <% end %> </h4>
+    </div>
+  </nav>
+
+  <a href="<%= Routes.private_path(@conn, :private)%>" class="center">Private page</a>
+
+    <main role="main" class="container">
+      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+      <%= @inner_content %>
+    </main>
+  </body>
+</html>
