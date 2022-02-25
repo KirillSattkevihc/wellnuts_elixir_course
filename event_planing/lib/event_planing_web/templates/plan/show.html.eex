@@ -1,0 +1,18 @@
+<h1>Show Plan</h1>
+
+<ul>
+
+  <li>
+    <strong>Date:</strong>
+    <%= @plan.date %>
+  </li>
+
+  <li>
+    <strong>Repetition:</strong>
+    <%= @plan.repetition %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.plan_path(@conn, :edit, @plan) %></span>
+<span><%= link "Back", to: Routes.plan_path(@conn, :index) %></span>
