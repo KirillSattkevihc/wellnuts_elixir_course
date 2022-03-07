@@ -26,16 +26,11 @@ defmodule EventPlaningWeb.PlanController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"plan" => plan_params}) do
-    case Events.create_plan(plan_params) do
-      {:ok, plan} ->
-        conn
-        |> put_flash(:info, "Plan created successfully.")
-        |> redirect(to: Routes.plan_path(conn, :show, plan))
+  def create(conn, _params) do
+    conn
+      |> put_flash(:info, "Plan created successfully.")
+      |> redirect(to: Routes.plan_path(conn, :index))
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
-    end
   end
 
   def show(conn, %{"id" => id}) do
@@ -50,18 +45,10 @@ defmodule EventPlaningWeb.PlanController do
     render(conn, "edit.html", plan: plan, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "plan" => plan_params}) do
-    plan = Events.get_plan!(id)
-
-    case Events.update_plan(plan, plan_params) do
-      {:ok, plan} ->
-        conn
-        |> put_flash(:info, "Plan updated successfully.")
-        |> redirect(to: Routes.plan_path(conn, :show, plan))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", plan: plan, changeset: changeset)
-    end
+  def update(conn, _params) do
+    conn
+    |> put_flash(:info, "Plan updated successfully.")
+    |> redirect(to: Routes.plan_path(conn, :index))
   end
 
   def delete(conn, %{"id" => id}) do
@@ -81,7 +68,6 @@ defmodule EventPlaningWeb.PlanController do
 
   def my_shedule(conn, _params) do
     plan= check_interval("week")
-
     render(conn,"my_shedule.html", plan: plan)
   end
 
@@ -102,12 +88,17 @@ defmodule EventPlaningWeb.PlanController do
     x= from(m in Plan)
     |> Repo.all()
     |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
-    |> Enum.map(fn x ->%{date: use_repetition(x.date, x.repetition) , repetition: x.repetition } end)
+    |> Enum.map(fn x ->%{id: x.id, date: use_repetition(x.id, x.date, x.repetition) , repetition: x.repetition } end)
     |> conflicted_events()
+
+
   end
 
   def conflicted_events(events) do
-    Enum.map(events, fn y-> %{date: y.date, repetition: y.repetition, count_events: Enum.count(events, fn x-> x.date==y.date end)} end)
+    IO.puts "----"
+    IO.inspect events
+    IO.puts "------"
+    Enum.map(events, fn y-> %{id: y.id, date: y.date, repetition: y.repetition, count_events: Enum.count(events, fn x-> x.date==y.date end)} end)
   end
 
   defp check_interval("week") do
@@ -129,47 +120,47 @@ defmodule EventPlaningWeb.PlanController do
 
   @day_sec 60* 60* 24
 
-  def use_repetition(date, "day") do
+  def use_repetition(id, date, "day") do
     now = DateTime.utc_now
     if DateTime.diff(date, now) > 0 do
       date
     else
       date = DateTime.add(date, @day_sec)
-      use_repetition(date, "day")
+      use_repetition(id, date, "day")
     end
   end
 
-  def use_repetition(date, "week") do
+  def use_repetition(id, date, "week") do
     now = DateTime.utc_now
     if DateTime.diff(date, now) > 0 do
       date
     else
       date = DateTime.add(date, @day_sec * 7)
-      use_repetition(date, "week")
+      use_repetition(id, date, "week")
     end
   end
 
-  def use_repetition(date, "month") do
+  def use_repetition(id, date, "month") do
     now = DateTime.utc_now
     if DateTime.diff(date, now) > 0 do
       date
     else
       date = DateTime.add(date, @day_sec* Date.days_in_month(date))
-      use_repetition(date, "month")
+      use_repetition(id, date, "month")
     end
   end
 
-  def use_repetition(date, "year") do
+  def use_repetition(id, date, "year") do
     now = DateTime.utc_now
     if DateTime.diff(date, now) > 0 do
       date
     else
       date = DateTime.add(date, @day_sec * 365)
-      use_repetition(date, "year")
+      use_repetition(id, date, "year")
     end
   end
 
-  def use_repetition(date, "none") do
+  def use_repetition(id, date, "none") do
     date
   end
 

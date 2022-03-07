@@ -12,23 +12,25 @@
     <tr>
       <th>Date</th>
       <th>Repetition</th>
-
       <th></th>
     </tr>
   </thead>
   <tbody>
 <%= for plan <- @plan do %>
   <%= if plan.count_events > 1 do %>
-    <tr>
-      <td><font color="#D1010B"><%= plan.date %></font></td>
-      <td><font color="#D1010B"><%= plan.repetition %></font></td>
-    </tr>
+      <%= content_tag :tr, id: plan.id do %>
+      <td><font color="red"><%= plan.date %></font></td>
+      <td><font color="red"><%= plan.repetition %></font></td>
+      <% end %>
   <% else %>
-     <tr>
+      <%= content_tag :tr, id: plan.id do %>
       <td><%= plan.date %></td>
       <td><%= plan.repetition %></td>
-    </tr>
-  <% end %>
+      <% end %>
+   <% end %>
+
 <% end %>
+  <tr id="event"></tr>
+
   </tbody>
 </table>
