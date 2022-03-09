@@ -3,6 +3,7 @@ defmodule EventPlaning.Repo.Migrations.CreatePlan do
 
   def change do
     create table(:plan) do
+      add :name, :string
       add :date, :utc_datetime
       add :repetition, :string
 

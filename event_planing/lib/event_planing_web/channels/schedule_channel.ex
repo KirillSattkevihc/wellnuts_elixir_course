@@ -50,7 +50,10 @@ defmodule EventPlaningWeb.ScheduleChannel do
   # Create Events
   @impl true
   def handle_in("create", %{"data" => data}, socket) do
-    new_data = data_replacer(data) |> Events.create_plan!()
+    new_data =
+      data_replacer(data)
+      |>name_replacer()
+      |> Events.create_plan!()
     broadcast(socket, "create", %{id: new_data.id})
     {:noreply, socket}
   end
@@ -72,7 +75,9 @@ defmodule EventPlaningWeb.ScheduleChannel do
   # Edit Events
   @impl true
   def handle_in("edit", %{"data" => data}, socket) do
-    new_data = data_replacer(data)
+    new_data =
+      data_replacer(data)
+      |> name_replacer()
 
     plan =
       data["id"]
@@ -106,21 +111,41 @@ defmodule EventPlaningWeb.ScheduleChannel do
         "month" => data["date_month"],
         "year" => data["date_year"]
       },
+      "name"=> data["name"],
       "repetition" => data["repetition"]
     }
   end
 
-  def html_gen(msg) do
+  defp html_gen(msg) do
     ~E"""
+    <td><%= msg.name %></td>
     <td><%= msg.date %></td>
     <td><%= msg.repetition %></td>
-    <td>
-      <span><%= link "Show", to: "plan/" <> Integer.to_string(msg.id) %></span>
-      <span><%= link "Edit", to: "plan/" <> Integer.to_string(msg.id)<> "/edit" %></span>
-      <span><%= link "Delete", to: "plan/",  method: :delete, id: "delete" %></span>
-    </td>
+
     """
     |> safe_to_string()
+  end
+
+  defp name_replacer(data) do
+    if data["name"] == "" do
+      Map.replace(data, "name", "Event " <> randomizer())
+    else
+      data
+    end
+  end
+
+  defp randomizer() do
+    :rand.bytes(10)
+    |> Base.url_encode64
+    |> String.codepoints()
+    |> Enum.flat_map(fn x ->
+        case Integer.parse(x) do
+          {x, _x} -> []
+          :error -> [x]
+        end
+      end)
+    |>List.to_string()
+    |>String.slice(0..5)
   end
 
   # Add authorization logic here as required.

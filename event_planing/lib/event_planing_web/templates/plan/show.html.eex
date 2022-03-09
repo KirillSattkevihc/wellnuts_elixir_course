@@ -2,6 +2,11 @@
 
 <ul>
 
+   <li>
+    <strong>Name:</strong>
+    <%= @plan.name %>
+  </li>
+
   <li>
     <strong>Date:</strong>
     <%= @plan.date %>

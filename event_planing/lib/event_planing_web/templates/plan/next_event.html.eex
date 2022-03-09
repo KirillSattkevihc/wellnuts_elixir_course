@@ -2,6 +2,7 @@
 <table>
   <thead>
     <tr>
+      <th>Name</th>
       <th>Date</th>
       <th>Repetition</th>
       <th>Time to </th>
@@ -11,6 +12,7 @@
   </thead>
   <tbody>
     <tr>
+      <td><%= @event.name %></td>
       <td><%= @event.date %></td>
       <td><%= @event.repetition %></td>
       <td><%= day= trunc(@event.time_to /(24*60*60))   %> days</td>

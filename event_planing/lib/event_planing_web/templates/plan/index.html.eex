@@ -2,6 +2,7 @@
 <table>
   <thead>
     <tr>
+      <th>Name</th>
       <th>Date</th>
       <th>Repetition</th>
       <th></th>
@@ -10,6 +11,7 @@
   <tbody>
   <%= for plan <- @plan do %>
       <%= content_tag :tr, id: plan.id do %>
+      <td><%= plan.name %></td>
       <td><%= plan.date %></td>
       <td><%= plan.repetition %></td>
       <%= content_tag :td, hidden: true, id: "plan_id" do %>
