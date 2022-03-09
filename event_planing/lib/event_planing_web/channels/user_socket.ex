@@ -1,7 +1,6 @@
 defmodule EventPlaningWeb.UserSocket do
   use Phoenix.Socket
 
-
   channel "schedule:lobby", EventPlaningWeb.ScheduleChannel
 
   @impl true

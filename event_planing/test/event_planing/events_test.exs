@@ -6,9 +6,8 @@ defmodule EventPlaning.EventsTest do
   describe "plan" do
     alias EventPlaning.Events.Plan
 
-    @valid_attrs %{date: "2010-04-17T14:00:00Z", repetition: "some repetition"}
-    @update_attrs %{date: "2011-05-18T15:01:01Z", repetition: "some updated repetition"}
-    @invalid_attrs %{date: nil, repetition: nil}
+    @valid_attrs %{date: ~U[2022-03-02 13:30:00Z], repetition: "week"}
+    @update_attrs %{date: ~U[2022-03-03 13:30:00Z], repetition: "month"}
 
     def plan_fixture(attrs \\ %{}) do
       {:ok, plan} =
@@ -31,25 +30,15 @@ defmodule EventPlaning.EventsTest do
 
     test "create_plan/1 with valid data creates a plan" do
       assert {:ok, %Plan{} = plan} = Events.create_plan(@valid_attrs)
-      assert plan.date == DateTime.from_naive!(~N[2010-04-17T14:00:00Z], "Etc/UTC")
-      assert plan.repetition == "some repetition"
-    end
-
-    test "create_plan/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Events.create_plan(@invalid_attrs)
+      assert plan.date == ~U[2022-03-02 13:30:00.000000Z]
+      assert plan.repetition == "week"
     end
 
     test "update_plan/2 with valid data updates the plan" do
       plan = plan_fixture()
       assert {:ok, %Plan{} = plan} = Events.update_plan(plan, @update_attrs)
-      assert plan.date == DateTime.from_naive!(~N[2011-05-18T15:01:01Z], "Etc/UTC")
-      assert plan.repetition == "some updated repetition"
-    end
-
-    test "update_plan/2 with invalid data returns error changeset" do
-      plan = plan_fixture()
-      assert {:error, %Ecto.Changeset{}} = Events.update_plan(plan, @invalid_attrs)
-      assert plan == Events.get_plan!(plan.id)
+      assert plan.date == ~U[2022-03-03 13:30:00.000000Z]
+      assert plan.repetition == "month"
     end
 
     test "delete_plan/1 deletes the plan" do

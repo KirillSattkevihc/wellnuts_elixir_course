@@ -43,59 +43,70 @@ defmodule EventPlaningWeb.ScheduleChannel do
       "delete",
       msg
     )
+
     {:noreply, socket}
   end
 
-# Create Events
+  # Create Events
   @impl true
-  def handle_in("create", %{"data"=>data}, socket) do
-    new_data=
-      data_replacer(data)|>Events.create_plan!()
+  def handle_in("create", %{"data" => data}, socket) do
+    new_data = data_replacer(data) |> Events.create_plan!()
     broadcast(socket, "create", %{id: new_data.id})
     {:noreply, socket}
   end
 
   @impl true
   def handle_out("create", msg, socket) do
-    push(socket,"create",
-    Map.merge(msg,
-    %{html_event: html_gen(Events.get_plan!(msg.id))})
-   )
-  {:noreply, socket}
+    push(
+      socket,
+      "create",
+      Map.merge(
+        msg,
+        %{html_event: html_gen(Events.get_plan!(msg.id))}
+      )
+    )
+
+    {:noreply, socket}
   end
 
-# Edit Events
+  # Edit Events
   @impl true
-  def handle_in("edit", %{"data"=>data}, socket) do
-    new_data= data_replacer(data)
+  def handle_in("edit", %{"data" => data}, socket) do
+    new_data = data_replacer(data)
+
     plan =
       data["id"]
       |> Events.get_plan!()
       |> Events.update_plan!(new_data)
+
     broadcast(socket, "edit", %{id: plan.id})
     {:noreply, socket}
   end
 
   @impl true
   def handle_out("edit", msg, socket) do
-    push(socket,"edit",
-    Map.merge(msg,
-    %{html_event: html_gen(Events.get_plan!(msg.id))})
-   )
-  {:noreply, socket}
+    push(
+      socket,
+      "edit",
+      Map.merge(
+        msg,
+        %{html_event: html_gen(Events.get_plan!(msg.id))}
+      )
+    )
+
+    {:noreply, socket}
   end
 
-
-
   defp data_replacer(data) do
-    %{"date"=> %{
-      "day" => data["date_day"],
-      "hour"=> data["date_hour"],
-      "minute"=>data["date_minute"],
-      "month"=> data["date_month"],
-      "year"=> data["date_year"]
-    },
-    "repetition"=> data["repetition"]
+    %{
+      "date" => %{
+        "day" => data["date_day"],
+        "hour" => data["date_hour"],
+        "minute" => data["date_minute"],
+        "month" => data["date_month"],
+        "year" => data["date_year"]
+      },
+      "repetition" => data["repetition"]
     }
   end
 

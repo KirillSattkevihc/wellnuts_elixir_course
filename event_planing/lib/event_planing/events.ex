@@ -60,6 +60,7 @@ defmodule EventPlaning.Events do
     |> Plan.changeset(attrs)
     |> Repo.insert!()
   end
+
   @doc """
   Updates a plan.
 
@@ -77,7 +78,6 @@ defmodule EventPlaning.Events do
     |> Plan.changeset(attrs)
     |> Repo.update()
   end
-
 
   def update_plan!(%Plan{} = plan, attrs) do
     plan
@@ -113,6 +113,4 @@ defmodule EventPlaning.Events do
   def change_plan(%Plan{} = plan, attrs \\ %{}) do
     Plan.changeset(plan, attrs)
   end
-
-
 end
