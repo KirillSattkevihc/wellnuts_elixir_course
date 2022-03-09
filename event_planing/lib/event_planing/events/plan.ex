@@ -14,6 +14,6 @@ defmodule EventPlaning.Events.Plan do
     plan
     |> cast(attrs, [:date, :repetition])
     |> validate_required([:date, :repetition])
-    |> validate_inclusion(:repetition, ["day","week","month","year","none"])
+    |> validate_inclusion(:repetition, ["day", "week", "month", "year", "none"])
   end
 end

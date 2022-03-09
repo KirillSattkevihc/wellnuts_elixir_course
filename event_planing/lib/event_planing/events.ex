@@ -101,6 +101,4 @@ defmodule EventPlaning.Events do
   def change_plan(%Plan{} = plan, attrs \\ %{}) do
     Plan.changeset(plan, attrs)
   end
-
-
 end

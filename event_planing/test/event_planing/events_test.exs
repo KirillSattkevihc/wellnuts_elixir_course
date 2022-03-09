@@ -34,7 +34,6 @@ defmodule EventPlaning.EventsTest do
       assert plan.repetition == "week"
     end
 
-
     test "update_plan/2 with valid data updates the plan" do
       plan = plan_fixture()
       assert {:ok, %Plan{} = plan} = Events.update_plan(plan, @update_attrs)

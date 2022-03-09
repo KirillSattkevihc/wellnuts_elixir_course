@@ -8,6 +8,5 @@ defmodule EventPlaning.Repo.Migrations.CreatePlan do
 
       timestamps()
     end
-
   end
 end
