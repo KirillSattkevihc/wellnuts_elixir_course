@@ -1,4 +1,4 @@
-<h1>My Shedule</h1>
+<h1>My Schedule</h1>
 <%= form_for @conn, Routes.plan_path(@conn, :my_shedule),
 [as: :repetition], fn f-> %>
 
