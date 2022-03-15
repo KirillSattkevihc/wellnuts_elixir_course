@@ -35,7 +35,7 @@ defmodule EventPlaning.Events do
       ** (Ecto.NoResultsError)
 
   """
-  def get_plan!(id), do: Repo.get!(Plan, id)
+  def get_plan(id), do: Repo.get(Plan, id)
 
   @doc """
   Creates a plan.
