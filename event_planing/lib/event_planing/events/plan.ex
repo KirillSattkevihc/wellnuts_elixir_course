@@ -6,6 +6,7 @@ defmodule EventPlaning.Events.Plan do
     field :name, :string
     field :date, :utc_datetime_usec
     field :repetition, :string, default: "week"
+    belongs_to :user, EventPlaning.Accounts.User
 
     timestamps()
   end

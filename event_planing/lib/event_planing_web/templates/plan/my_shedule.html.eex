@@ -1,5 +1,5 @@
 <h1>My Schedule</h1>
-<%= form_for @conn, Routes.plan_path(@conn, :my_shedule),
+<%= form_for @conn, Routes.user_plan_path(@conn, :my_shedule, @u_id),
 [as: :repetition], fn f-> %>
 
 <%= select f, :rep, [ "week": "week", "month": "month", "year": "year"] %>

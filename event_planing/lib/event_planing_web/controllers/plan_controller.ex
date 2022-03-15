@@ -2,8 +2,9 @@ defmodule EventPlaningWeb.PlanController do
   use EventPlaningWeb, :controller
   plug :check_user
   import Ecto.Query
-  alias EventPlaning.{Repo, Events}
-  alias EventPlaning.Events.Plan
+  import Ecto
+  alias EventPlaning.Events
+  alias EventPlaning.{Repo, Events.Plan}
 
   def index(conn, _params) do
     plan = Events.list_plan()
@@ -11,7 +12,7 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   def check_user(conn, _params) do
-    if conn.assigns[:password] do
+    if conn.assigns[:u_id] do
       conn
     else
       conn
@@ -29,7 +30,7 @@ defmodule EventPlaningWeb.PlanController do
   def create(conn, _params) do
     conn
     |> put_flash(:info, "Plan created successfully.")
-    |> redirect(to: Routes.plan_path(conn, :index))
+    |> redirect(to: Routes.user_plan_path(conn, :index))
   end
 
   def show(conn, %{"id" => id}) do
@@ -47,7 +48,7 @@ defmodule EventPlaningWeb.PlanController do
   def update(conn, _params) do
     conn
     |> put_flash(:info, "Plan updated successfully.")
-    |> redirect(to: Routes.plan_path(conn, :index))
+    |> redirect(to: Routes.user_plan_path(conn, :index))
   end
 
   def delete(conn, %{"id" => id}) do
@@ -56,7 +57,7 @@ defmodule EventPlaningWeb.PlanController do
 
     conn
     |> put_flash(:info, "Plan deleted successfully.")
-    |> redirect(to: Routes.plan_path(conn, :index))
+    |> redirect(to: Routes.user_plan_path(conn, :index))
   end
 
   def my_shedule(conn, %{"repetition" => %{"rep" => rep}} = params) do

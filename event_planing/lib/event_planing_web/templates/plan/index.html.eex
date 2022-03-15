@@ -18,9 +18,9 @@
       <%= plan.id %>
       <% end %>
       <td>
-        <span><%= link "Show", to: Routes.plan_path(@conn, :show, plan) %></span>
-        <span><%= link "Edit", to: Routes.plan_path(@conn, :edit, plan) %></span>
-        <span><%= link "Delete", to: Routes.plan_path(@conn, :delete, plan), method: :delete, id: "delete" %></span>
+        <span><%= link "Show", to: Routes.user_plan_path(@conn, :show, @u_id, plan) %></span>
+        <span><%= link "Edit", to: Routes.user_plan_path(@conn, :edit, @u_id, plan) %></span>
+        <span><%= link "Delete", to: Routes.user_plan_path(@conn, :delete, @u_id, plan), method: :delete, id: "delete" %></span>
 
         <% end %>
     <% end %>
@@ -30,6 +30,6 @@
 
 
 
-<span><%= link "New Plan", to: Routes.plan_path(@conn, :new) %></span>
-<span><%= link "Next Event", to: Routes.plan_path(@conn, :next_event) %></span>
-<span><%= link "My shedule", to: Routes.plan_path(@conn, :my_shedule) %></span>
+<span><%= link "New Plan", to: Routes.user_plan_path(@conn, :new, @u_id) %></span>
+<span><%= link "Next Event", to: Routes.user_plan_path(@conn, :next_event, @u_id) %></span>
+<span><%= link "My shedule", to: Routes.user_plan_path(@conn, :my_shedule, @u_id) %></span>

@@ -22,12 +22,14 @@ defmodule EventPlaningWeb.Router do
     post "/account", PageController, :login
     get "/logout", PageController, :logout
     get "/private", PrivateController, :private
-    resources "/plan", PlanController
-    get "/my_shedule", PlanController, :my_shedule
-    post "/my_shedule", PlanController, :my_shedule
-    get "/next_event", PlanController, :next_event
-  end
+    resources "/user", UserController do
+      resources "/plan", PlanController
+      get "/my_shedule", PlanController, :my_shedule
+      post "/my_shedule", PlanController, :my_shedule
+      get "/next_event", PlanController, :next_event
 
+    end
+  end
   # Other scopes may use custom stacks.
   # scope "/api", EventPlaningWeb do
   #   pipe_through :api
