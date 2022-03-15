@@ -6,6 +6,8 @@ defmodule EventPlaningWeb.PlanController do
   alias EventPlaning.Events
   alias EventPlaning.{Repo, Events.Plan}
 
+  @day_sec 60 * 60 * 24
+
   def index(conn, _params) do
     plan = Events.list_plan()
     render(conn, "index.html", plan: plan)
@@ -34,13 +36,14 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   def show(conn, %{"id" => id}) do
-    plan = Events.get_plan!(id)
-
+    IO.puts("-----------")
+    IO.inspect(Events.get_plan(id))
+    plan = Events.get_plan(id)
     render(conn, "show.html", plan: plan)
   end
 
   def edit(conn, %{"id" => id}) do
-    plan = Events.get_plan!(id)
+    plan = Events.get_plan(id)
     changeset = Events.change_plan(plan)
     render(conn, "edit.html", plan: plan, changeset: changeset)
   end
@@ -52,7 +55,7 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   def delete(conn, %{"id" => id}) do
-    plan = Events.get_plan!(id)
+    plan = Events.get_plan(id)
     {:ok, _plan} = Events.delete_plan(plan)
 
     conn
@@ -71,8 +74,8 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   def next_event(conn, _params) do
-    if check_db != [] do
-      event =
+    if Enum.any?(check_db()) do
+      next_ev =
         check_db
         |> Enum.map(fn x ->
           %{
@@ -84,10 +87,9 @@ defmodule EventPlaningWeb.PlanController do
         end)
         |> Enum.min_by(& &1.time_to)
 
-      render(conn, "next_event.html", event: event)
+      render(conn, "next_event.html", plans: next_ev, next_event: true)
     else
-      event = %{name: "there are no name", date: "there are no date", repetition: "there are no events", time_to: 0}
-      render(conn, "next_event.html", event: event)
+      render(conn, "next_event.html", next_event: false)
     end
   end
 
@@ -97,23 +99,19 @@ defmodule EventPlaningWeb.PlanController do
       |> Repo.all()
       |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
       |> Enum.map(fn x ->
-        %{name: x.name, id: x.id, date: use_repetition(x.id, x.date, x.repetition), repetition: x.repetition}
+        %{name: x.name, id: x.id, date: use_repetition(x.date, x.repetition), repetition: x.repetition}
       end)
       |> conflicted_events()
   end
 
-  def conflicted_events(events) do
-    IO.puts("----")
-    IO.inspect(events)
-    IO.puts("------")
-
-    Enum.map(events, fn y ->
+  defp conflicted_events(plans) do
+    Enum.map(plans, fn y ->
       %{
         name: y.name,
         id: y.id,
         date: y.date,
         repetition: y.repetition,
-        count_events: Enum.count(events, fn x -> x.date == y.date end)
+        count_events: Enum.count(plans, fn x -> x.date == y.date end)
       }
     end)
   end
@@ -133,53 +131,39 @@ defmodule EventPlaningWeb.PlanController do
     check_db() |> Enum.filter(fn x -> Date.diff(last_year_day, x.date) > 0 end)
   end
 
-  @day_sec 60 * 60 * 24
-
-  def use_repetition(id, date, "day") do
-    now = DateTime.utc_now()
-
-    if DateTime.diff(date, now) > 0 do
-      date
-    else
-      date = DateTime.add(date, @day_sec)
-      use_repetition(id, date, "day")
+  defp use_repetition(date, "day") do
+    case future_date?(date, DateTime.utc_now()) do
+      true -> date
+      false -> DateTime.add(date, @day_sec) |> use_repetition("day")
     end
   end
 
-  def use_repetition(id, date, "week") do
-    now = DateTime.utc_now()
-
-    if DateTime.diff(date, now) > 0 do
-      date
-    else
-      date = DateTime.add(date, @day_sec * 7)
-      use_repetition(id, date, "week")
+  defp use_repetition(date, "week") do
+    case future_date?(date, DateTime.utc_now()) do
+      true -> date
+      false -> DateTime.add(date, @day_sec * 7) |> use_repetition("week")
     end
   end
 
-  def use_repetition(id, date, "month") do
-    now = DateTime.utc_now()
-
-    if DateTime.diff(date, now) > 0 do
-      date
-    else
-      date = DateTime.add(date, @day_sec * Date.days_in_month(date))
-      use_repetition(id, date, "month")
+  defp use_repetition(date, "month") do
+    case future_date?(date, DateTime.utc_now()) do
+      true -> date
+      false -> DateTime.add(date, @day_sec * Date.days_in_month(date)) |> use_repetition("month")
     end
   end
 
-  def use_repetition(id, date, "year") do
-    now = DateTime.utc_now()
-
-    if DateTime.diff(date, now) > 0 do
-      date
-    else
-      date = DateTime.add(date, @day_sec * 365)
-      use_repetition(id, date, "year")
+  defp use_repetition(date, "year") do
+    case future_date?(date, DateTime.utc_now()) do
+      true -> date
+      false -> DateTime.add(date, @day_sec * 365) |> use_repetition("year")
     end
   end
 
-  def use_repetition(id, date, "none") do
+  defp use_repetition(date, "none") do
     date
+  end
+
+  defp future_date?(date, now) do
+    DateTime.diff(date, now) > 0
   end
 end

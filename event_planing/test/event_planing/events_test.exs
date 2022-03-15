@@ -23,9 +23,9 @@ defmodule EventPlaning.EventsTest do
       assert Events.list_plan() == [plan]
     end
 
-    test "get_plan!/1 returns the plan with given id" do
+    test "get_plan/1 returns the plan with given id" do
       plan = plan_fixture()
-      assert Events.get_plan!(plan.id) == plan
+      assert Events.get_plan(plan.id) == plan
     end
 
     test "create_plan/1 with valid data creates a plan" do
@@ -39,12 +39,6 @@ defmodule EventPlaning.EventsTest do
       assert {:ok, %Plan{} = plan} = Events.update_plan(plan, @update_attrs)
       assert plan.date == ~U[2022-03-03 13:30:00.000000Z]
       assert plan.repetition == "month"
-    end
-
-    test "delete_plan/1 deletes the plan" do
-      plan = plan_fixture()
-      assert {:ok, %Plan{}} = Events.delete_plan(plan)
-      assert_raise Ecto.NoResultsError, fn -> Events.get_plan!(plan.id) end
     end
 
     test "change_plan/1 returns a plan changeset" do

@@ -63,7 +63,7 @@ defmodule EventPlaningWeb.PlanControllerTest do
     end
   end
 
-  # ?
+
   describe "delete plan" do
     setup [:create_plan]
 
@@ -71,10 +71,6 @@ defmodule EventPlaningWeb.PlanControllerTest do
       conn = post(conn, Routes.page_path(conn, :login), %{"password" => %{"pass" => @pass}})
       conn = delete(conn, Routes.plan_path(conn, :delete, plan))
       assert redirected_to(conn) == Routes.plan_path(conn, :index)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.plan_path(conn, :show, plan))
-      end
     end
   end
 

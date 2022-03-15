@@ -1,4 +1,4 @@
-defmodule EventPlaning.Repo.Migrations.CreatePlan do
+defmodule EventPlaning.Repo.Migrations.CreatePlans do
   use Ecto.Migration
 
   def change do
