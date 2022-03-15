@@ -1,5 +1,6 @@
 <h1>Next Event</h1>
 <table>
+<%= if @next_event == true  do %>
   <thead>
     <tr>
       <th>Date</th>
@@ -11,16 +12,15 @@
   </thead>
   <tbody>
     <tr>
-    <%= if @next_event == true  do %>
-      <td><%= @event.date %></td>
-      <td><%= @event.repetition %></td>
-      <td><%= day= trunc(@event.time_to /(24*60*60))   %> days</td>
-      <td><%= hours= trunc((@event.time_to - day*(24*60*60))/(60*60) )   %> hours</td>
-      <td><%= minutes= trunc((@event.time_to - day*(24*60*60)- hours*(60*60))/(60) )    %> minutes</td>
-    <%= else %>
-      <th>OOps, You didn't plan anything</th>
-    <% end %>>
+      <td><%= @plans.date %></td>
+      <td><%= @plans.repetition %></td>
+      <td><%= day= trunc(@plans.time_to /(24*60*60))   %> days</td>
+      <td><%= hours= trunc((@plans.time_to - day*(24*60*60))/(60*60) )   %> hours</td>
+      <td><%= minutes= trunc((@plans.time_to - day*(24*60*60)- hours*(60*60))/(60) )    %> minutes</td>
     </tr>
 
   </tbody>
+  <%= else %>
+    <th>OOps, You didn't plan anything</th>
+  <% end %>
 </table>
