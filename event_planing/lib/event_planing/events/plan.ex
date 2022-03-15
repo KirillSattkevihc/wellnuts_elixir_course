@@ -11,7 +11,7 @@ defmodule EventPlaning.Events.Plan do
   end
 
   @doc false
-  def changeset(plan, attrs) do
+  def changeset(plans, attrs) do
     plans
     |> cast(attrs, [:name ,:date, :repetition])
     |> validate_required([:name, :date, :repetition])
