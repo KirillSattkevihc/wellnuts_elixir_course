@@ -44,27 +44,39 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   def show(conn, %{"id" => id}) do
-    plan = Events.get_plan(id)
+    case Events.get_plan(id) do
+      %Plan{} = plan ->
+        if Ability.can?(plan, :update, conn.assigns[:user_info]) do
+          render(conn, "show.html", plan: plan)
+        else
+          conn
+          |> put_flash(:info, "Your abilities aren't strong.")
+          |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+        end
 
-    if Ability.can?(plan, :update, conn.assigns[:user_info]) do
-      render(conn, "show.html", plan: plan)
-    else
-      conn
-      |> put_flash(:info, "Your abilities aren't strong.")
-      |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+      nil ->
+        conn
+        |> put_flash(:info, "Bad plan id.")
+        |> redirect(to: Routes.plan_path(conn, :index))
     end
   end
 
   def edit(conn, %{"id" => id}) do
-    plan = Events.get_plan(id)
+    case Events.get_plan(id) do
+      %Plan{} = plan ->
+        if Ability.can?(plan, :update, conn.assigns[:user_info]) do
+          changeset = Events.change_plan(plan)
+          render(conn, "edit.html", plan: plan, changeset: changeset)
+        else
+          conn
+          |> put_flash(:info, "Your abilities aren't strong.")
+          |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+        end
 
-    if Ability.can?(plan, :update, conn.assigns[:user_info]) do
-      changeset = Events.change_plan(plan)
-      render(conn, "edit.html", plan: plan, changeset: changeset)
-    else
-      conn
-      |> put_flash(:info, "Your abilities aren't strong.")
-      |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+      nil ->
+        conn
+        |> put_flash(:info, "Bad  plan id.")
+        |> redirect(to: Routes.plan_path(conn, :index))
     end
   end
 
@@ -167,28 +179,28 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   defp use_repetition(date, "day") do
-    case future_date?(date, DateTime.utc_now()) do
+    case date_diff?(date, DateTime.utc_now()) do
       true -> date
       false -> DateTime.add(date, @day_sec) |> use_repetition("day")
     end
   end
 
   defp use_repetition(date, "week") do
-    case future_date?(date, DateTime.utc_now()) do
+    case date_diff?(date, DateTime.utc_now()) do
       true -> date
       false -> DateTime.add(date, @day_sec * 7) |> use_repetition("week")
     end
   end
 
   defp use_repetition(date, "month") do
-    case future_date?(date, DateTime.utc_now()) do
+    case date_diff?(date, DateTime.utc_now()) do
       true -> date
       false -> DateTime.add(date, @day_sec * Date.days_in_month(date)) |> use_repetition("month")
     end
   end
 
   defp use_repetition(date, "year") do
-    case future_date?(date, DateTime.utc_now()) do
+    case date_diff?(date, DateTime.utc_now()) do
       true -> date
       false -> DateTime.add(date, @day_sec * 365) |> use_repetition("year")
     end
@@ -198,7 +210,7 @@ defmodule EventPlaningWeb.PlanController do
     date
   end
 
-  defp future_date?(date, now) do
+  defp date_diff?(date, now) do
     DateTime.diff(date, now) > 0
   end
 end
