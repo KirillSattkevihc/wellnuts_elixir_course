@@ -49,7 +49,7 @@ defmodule EventPlaningWeb.ScheduleChannel do
     new_data =
       data_replacer(data)
       |> name_replacer()
-      |> Events.create_plan()
+      |> Events.create_plan!()
 
     broadcast(socket, "create", %{id: new_data.id})
     {:noreply, socket}

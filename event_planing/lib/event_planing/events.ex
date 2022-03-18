@@ -53,7 +53,7 @@ defmodule EventPlaning.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_plan(attrs \\ %{}) do
+  def create_plan!(attrs \\ %{}) do
     %Plan{}
     |> Plan.changeset(attrs)
     |> Repo.insert!()
@@ -71,7 +71,7 @@ defmodule EventPlaning.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_plan(%Plan{} = plan, attrs) do
+  def update_plan!(%Plan{} = plan, attrs) do
     plan
     |> Plan.changeset(attrs)
     |> Repo.update()
