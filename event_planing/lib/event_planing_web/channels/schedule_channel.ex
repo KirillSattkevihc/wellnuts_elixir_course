@@ -38,21 +38,13 @@ defmodule EventPlaningWeb.ScheduleChannel do
 
   @impl true
   def handle_out("delete", msg, socket) do
-    push(
-      socket,
-      "delete",
-      msg
-    )
-
+    push(socket,"delete", msg)
     {:noreply, socket}
   end
 
   # Create Events
   @impl true
   def handle_in("create", %{"data" => data}, socket) do
-    IO.puts("-------")
-    IO.inspect(data)
-
     new_data = data_replacer(data) |> Events.create_plan()
     broadcast(socket, "create", %{id: new_data.id})
     {:noreply, socket}
@@ -65,10 +57,7 @@ defmodule EventPlaningWeb.ScheduleChannel do
       "create",
       Map.merge(
         msg,
-        %{html_event: html_gen(Events.get_plan(msg.id))}
-      )
-    )
-
+        %{html_event: html_gen(Events.get_plan(msg.id))}))
     {:noreply, socket}
   end
 
@@ -76,12 +65,10 @@ defmodule EventPlaningWeb.ScheduleChannel do
   @impl true
   def handle_in("edit", %{"data" => data}, socket) do
     new_data = data_replacer(data)
-
     plan =
       data["id"]
       |> Events.get_plan()
       |> Events.update_plan!(new_data)
-
     broadcast(socket, "edit", %{id: plan.id})
     {:noreply, socket}
   end

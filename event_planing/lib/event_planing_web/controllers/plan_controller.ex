@@ -108,7 +108,7 @@ defmodule EventPlaningWeb.PlanController do
     |> Repo.all()
     |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
-      %{date: use_repetition(x.date, x.repetition), repetition: x.repetition}
+      %{id: x.id, date: use_repetition(x.date, x.repetition), repetition: x.repetition}
     end)
     |> conflicted_events()
   end
