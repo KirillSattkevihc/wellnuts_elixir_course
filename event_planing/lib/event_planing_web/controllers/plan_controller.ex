@@ -5,7 +5,6 @@ defmodule EventPlaningWeb.PlanController do
   alias EventPlaning.{Repo, Events}
   alias EventPlaning.Events.Plan
 
-
   @day_sec 60 * 60 * 24
 
   def index(conn, _params) do
@@ -42,16 +41,28 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   def show(conn, %{"id" => id}) do
-    IO.puts "-----------"
-    IO.inspect Events.get_plan(id)
-    plan = Events.get_plan(id)
-    render(conn, "show.html", plan: plan)
+    case Events.get_plan(id) do
+      %Plan{} = plan ->
+        render(conn, "show.html", plan: plan)
+
+      nil ->
+        conn
+        |> put_flash(:info, "Bad  plan id.")
+        |> redirect(to: Routes.plan_path(conn, :index))
+    end
   end
 
   def edit(conn, %{"id" => id}) do
-    plan = Events.get_plan(id)
-    changeset = Events.change_plan(plan)
-    render(conn, "edit.html", plan: plan, changeset: changeset)
+    case Events.get_plan(id) do
+      %Plan{} = plan ->
+        changeset = Events.change_plan(plan)
+        render(conn, "edit.html", plan: plan, changeset: changeset)
+
+      nil ->
+        conn
+        |> put_flash(:info, "Bad  plan id.")
+        |> redirect(to: Routes.plan_path(conn, :index))
+    end
   end
 
   def update(conn, %{"id" => id, "plan" => plan_params}) do
@@ -108,14 +119,13 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   defp check_db() do
-    x =
-      from(m in Plan)
-      |> Repo.all()
-      |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
-      |> Enum.map(fn x ->
-        %{date: use_repetition(x.date, x.repetition), repetition: x.repetition}
-      end)
-      |> conflicted_events()
+    from(m in Plan)
+    |> Repo.all()
+    |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
+    |> Enum.map(fn x ->
+      %{date: use_repetition(x.date, x.repetition), repetition: x.repetition}
+    end)
+    |> conflicted_events()
   end
 
   defp conflicted_events(events) do
@@ -145,29 +155,29 @@ defmodule EventPlaningWeb.PlanController do
 
   defp use_repetition(date, "day") do
     case date_diff?(date, DateTime.utc_now()) do
-      true-> date
-      false-> DateTime.add(date, @day_sec )|> use_repetition( "day")
+      true -> date
+      false -> DateTime.add(date, @day_sec) |> use_repetition("day")
     end
   end
 
   defp use_repetition(date, "week") do
     case date_diff?(date, DateTime.utc_now()) do
-      true-> date
-      false-> DateTime.add(date, @day_sec * 7)|> use_repetition( "week")
+      true -> date
+      false -> DateTime.add(date, @day_sec * 7) |> use_repetition("week")
     end
   end
 
   defp use_repetition(date, "month") do
     case date_diff?(date, DateTime.utc_now()) do
-      true-> date
-      false-> DateTime.add(date, @day_sec * Date.days_in_month(date))|> use_repetition( "month")
+      true -> date
+      false -> DateTime.add(date, @day_sec * Date.days_in_month(date)) |> use_repetition("month")
     end
   end
 
   defp use_repetition(date, "year") do
     case date_diff?(date, DateTime.utc_now()) do
-      true-> date
-      false->  DateTime.add(date, @day_sec * 365)|> use_repetition( "year")
+      true -> date
+      false -> DateTime.add(date, @day_sec * 365) |> use_repetition("year")
     end
   end
 
@@ -176,6 +186,6 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   defp date_diff?(date, now) do
-    DateTime.diff(date, now)>0
+    DateTime.diff(date, now) > 0
   end
 end
