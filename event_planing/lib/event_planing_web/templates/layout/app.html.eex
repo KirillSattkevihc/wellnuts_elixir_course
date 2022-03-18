@@ -13,14 +13,16 @@
 
   <nav>
     <div class="nav-wrapper">
-      <h4 class="right"><%= if @conn.assigns[:u_id] do %>
-      <a href="<%= Routes.user_plan_path(@conn, :index, @u_id)%>" class="brand-logo">Event Planing</a>
-      <a href="<%= Routes.user_plan_path(@conn, :my_shedule, @u_id)%>" class="brand-logo">My Shedule</a>
-      <a href="<%= Routes.user_plan_path(@conn, :next_event, @u_id)%>" class="brand-logo">Next Event</a>
-      <a href="<%= Routes.user_path(@conn, :index)%>" class="brand-logo"> Users List </a>
+      <h4 class="right"><%= if @conn.assigns[:user_info] do %>
+      <a href="<%= Routes.user_plan_path(@conn, :index, @user_info)%>" class="brand-logo">Event Planing</a>
+      <a href="<%= Routes.user_plan_path(@conn, :my_shedule, @user_info)%>" class="brand-logo">My Shedule</a>
+      <a href="<%= Routes.user_plan_path(@conn, :next_event, @user_info)%>" class="brand-logo">Next Event</a>
+      <a href="<%= Routes.user_path(@conn, :index)%>" class="brand-logo"> Users List </a><br>
       <%= link "logout", to: Routes.page_path(@conn, :logout, class: "btn btn-primary blue") %>
+      <a href="<%= Routes.user_path(@conn, :show, @user_info.id)%>" class="brand-logo"> User_info </a>
       <% else %>
       <%= link "login", to: Routes.page_path(@conn, :login, class: "btn btn-primary blue") %>
+      <a href="<%= Routes.user_path(@conn, :new)%>" class="brand-logo"> Registry </a>
       <% end %> </h4>
     </div>
   </nav>

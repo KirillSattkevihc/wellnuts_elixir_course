@@ -14,8 +14,8 @@ defmodule EventPlaning.Events.Plan do
   @doc false
   def changeset(plans, attrs) do
     plans
-    |> cast(attrs, [:name ,:date, :repetition])
-    |> validate_required([:name, :date, :repetition])
+    |> cast(attrs, [:name, :date, :repetition, :users_id])
+    |> validate_required([:name, :date, :repetition, :users_id])
     |> validate_inclusion(:repetition, ["day", "week", "month", "year", "none"])
   end
 end

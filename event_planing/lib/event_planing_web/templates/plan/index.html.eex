@@ -1,4 +1,5 @@
 <h1>Listing Plan</h1>
+<%= if @user_info.role== "user" do %>
 <table>
   <thead>
     <tr>
@@ -14,22 +15,47 @@
       <td><%= plan.name %></td>
       <td><%= plan.date %></td>
       <td><%= plan.repetition %></td>
-      <%= content_tag :td, hidden: true, id: "plan_id" do %>
-      <%= plan.id %>
-      <% end %>
       <td>
-        <span><%= link "Show", to: Routes.user_plan_path(@conn, :show, @u_id, plan) %></span>
-        <span><%= link "Edit", to: Routes.user_plan_path(@conn, :edit, @u_id, plan) %></span>
-        <span><%= link "Delete", to: Routes.user_plan_path(@conn, :delete, @u_id, plan), method: :delete, id: "delete" %></span>
+        <span><%= link "Show", to: Routes.user_plan_path(@conn, :show,  @user_info.id, plan) %></span>
+        <span><%= link "Edit", to: Routes.user_plan_path(@conn, :edit,  @user_info.id, plan) %></span>
+        <span><%= link "Delete", to: Routes.user_plan_path(@conn, :delete,  @user_info.id, plan), method: :delete, id: "delete" %></span>
 
         <% end %>
     <% end %>
    <tr id="event"></tr>
   </tbody>
 </table>
+<% else %>
+  <table>
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Name</th>
+      <th>Date</th>
+      <th>Repetition</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  <%= for plan <- @plan do %>
+      <%= content_tag :tr, id: plan.id do %>
+      <td><%= plan.users_id %></td>
+      <td><%= plan.name %></td>
+      <td><%= plan.date %></td>
+      <td><%= plan.repetition %></td>
+      <td>
+        <span><%= link "Show", to: Routes.user_plan_path(@conn, :show,  @user_info.id, plan) %></span>
+        <span><%= link "Edit", to: Routes.user_plan_path(@conn, :edit,  @user_info.id, plan) %></span>
+        <span><%= link "Delete", to: Routes.user_plan_path(@conn, :delete,  @user_info.id, plan), method: :delete, id: "delete" %></span>
+
+        <% end %>
+    <% end %>
+   <tr id="event"></tr>
+  </tbody>
+</table>
+<% end %>
 
 
-
-<span><%= link "New Plan", to: Routes.user_plan_path(@conn, :new, @u_id) %></span>
-<span><%= link "Next Event", to: Routes.user_plan_path(@conn, :next_event, @u_id) %></span>
-<span><%= link "My shedule", to: Routes.user_plan_path(@conn, :my_shedule, @u_id) %></span>
+<span><%= link "New Plan", to: Routes.user_plan_path(@conn, :new, @user_info) %></span>
+<span><%= link "Next Event", to: Routes.user_plan_path(@conn, :next_event, @user_info) %></span>
+<span><%= link "My shedule", to: Routes.user_plan_path(@conn, :my_shedule, @user_info) %></span>
