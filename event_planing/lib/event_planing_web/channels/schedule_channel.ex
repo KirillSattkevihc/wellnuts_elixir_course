@@ -38,12 +38,7 @@ defmodule EventPlaningWeb.ScheduleChannel do
 
   @impl true
   def handle_out("delete", msg, socket) do
-    push(
-      socket,
-      "delete",
-      msg
-    )
-
+    push(socket, "delete", msg)
     {:noreply, socket}
   end
 
