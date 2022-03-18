@@ -105,13 +105,18 @@ defmodule EventPlaningWeb.PlanController do
   end
 
   defp check_db() do
-      from(m in Plan)
-      |> Repo.all()
-      |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
-      |> Enum.map(fn x ->
-        %{name: x.name, id: x.id, date: use_repetition(x.date, x.repetition), repetition: x.repetition}
-      end)
-      |> conflicted_events()
+    from(m in Plan)
+    |> Repo.all()
+    |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
+    |> Enum.map(fn x ->
+      %{
+        name: x.name,
+        id: x.id,
+        date: use_repetition(x.date, x.repetition),
+        repetition: x.repetition
+      }
+    end)
+    |> conflicted_events()
   end
 
   defp conflicted_events(plans) do

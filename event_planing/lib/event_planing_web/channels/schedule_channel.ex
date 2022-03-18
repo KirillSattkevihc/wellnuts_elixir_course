@@ -47,8 +47,9 @@ defmodule EventPlaningWeb.ScheduleChannel do
   def handle_in("create", %{"data" => data}, socket) do
     new_data =
       data_replacer(data)
-      |>name_replacer()
+      |> name_replacer()
       |> Events.create_plan!()
+
     broadcast(socket, "create", %{id: new_data.id})
     {:noreply, socket}
   end
@@ -106,7 +107,7 @@ defmodule EventPlaningWeb.ScheduleChannel do
         "month" => data["date_month"],
         "year" => data["date_year"]
       },
-      "name"=> data["name"],
+      "name" => data["name"],
       "repetition" => data["repetition"]
     }
   end
@@ -131,16 +132,16 @@ defmodule EventPlaningWeb.ScheduleChannel do
 
   defp randomizer() do
     :rand.bytes(10)
-    |> Base.url_encode64
+    |> Base.url_encode64()
     |> String.codepoints()
     |> Enum.flat_map(fn x ->
-        case Integer.parse(x) do
-          {x, _x} -> []
-          :error -> [x]
-        end
-      end)
-    |>List.to_string()
-    |>String.slice(0..5)
+      case Integer.parse(x) do
+        {x, _x} -> []
+        :error -> [x]
+      end
+    end)
+    |> List.to_string()
+    |> String.slice(0..5)
   end
 
   # Add authorization logic here as required.
