@@ -19,7 +19,7 @@ defmodule EventPlaningWeb.PlanController do
     end
   end
 
-  def index(conn, _params) do
+  def index(conn, _params, file \\ nil) do
     user = conn.assigns[:user_info]
 
     plan =
@@ -35,6 +35,14 @@ defmodule EventPlaningWeb.PlanController do
   def new(conn, _params) do
     changeset = Events.change_plan(%Plan{})
     render(conn, "new.html", changeset: changeset)
+  end
+
+  def create(conn, %{"ics" => ics}) do
+    init_db(conn.assigns[:user_info], ics.path)
+
+    conn
+    |> put_flash(:info, "Plans upload successfully.")
+    |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
   end
 
   def create(conn, _params) do
@@ -100,6 +108,15 @@ defmodule EventPlaningWeb.PlanController do
       |> put_flash(:info, "Plan delete crash.")
       |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
     end
+  end
+
+  defp init_db(user_info, path) do
+    File.read!(path)
+    |> ICalendar.from_ics()
+    |> Stream.map(fn x ->
+      %{name: x.summary, date: x.dtstart, repetition: "year", users_id: user_info.id}
+    end)
+    |> Enum.each(fn x -> Events.create_plan!(x) end)
   end
 
   def my_shedule(conn, %{"repetition" => %{"rep" => rep}} = params) do

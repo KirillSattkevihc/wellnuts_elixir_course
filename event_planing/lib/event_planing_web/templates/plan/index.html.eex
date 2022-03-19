@@ -55,6 +55,11 @@
 </table>
 <% end %>
 
+<%= form_for @conn, Routes.user_plan_path(@conn, :create,  @user_info.id), [multipart: true], fn f -> %>
+  <%= file_input f, :ics, accept: ".ics", required: true %>  <div>
+    <%= submit "Import ICS" %>
+  </div>
+<% end %>
 
 <span><%= link "New Plan", to: Routes.user_plan_path(@conn, :new, @user_info) %></span>
 <span><%= link "Next Event", to: Routes.user_plan_path(@conn, :next_event, @user_info) %></span>
