@@ -56,7 +56,7 @@ defmodule EventPlaning.Events do
   def create_plan!(attrs \\ %{}) do
     %Plan{}
     |> Plan.changeset(attrs)
-    |> Repo.insert!()
+    |> Repo.insert()
   end
 
   @doc """
