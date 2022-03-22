@@ -28,16 +28,10 @@ defmodule EventPlaningWeb.PlanController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"plan" => plan_params}) do
-    case Events.create_plan(plan_params) do
-      {:ok, plan} ->
-        conn
-        |> put_flash(:info, "Plan created successfully.")
-        |> redirect(to: Routes.plan_path(conn, :show, plan))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "new.html", changeset: changeset)
-    end
+  def create(conn, _params) do
+    conn
+    |> put_flash(:info, "Plan created successfully.")
+    |> redirect(to: Routes.plan_path(conn, :index))
   end
 
   def show(conn, %{"id" => id}) do
@@ -65,18 +59,10 @@ defmodule EventPlaningWeb.PlanController do
     end
   end
 
-  def update(conn, %{"id" => id, "plan" => plan_params}) do
-    plan = Events.get_plan(id)
-
-    case Events.update_plan(plan, plan_params) do
-      {:ok, plan} ->
-        conn
-        |> put_flash(:info, "Plan updated successfully.")
-        |> redirect(to: Routes.plan_path(conn, :show, plan))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, "edit.html", plan: plan, changeset: changeset)
-    end
+  def update(conn, _params) do
+    conn
+    |> put_flash(:info, "Plan updated successfully.")
+    |> redirect(to: Routes.plan_path(conn, :index))
   end
 
   def delete(conn, %{"id" => id}) do
@@ -95,13 +81,12 @@ defmodule EventPlaningWeb.PlanController do
 
   def my_shedule(conn, _params) do
     plan = check_interval("week")
-
     render(conn, "my_shedule.html", plan: plan)
   end
 
   def next_event(conn, _params) do
     if Enum.any?(check_db()) do
-      event =
+      next_ev =
         check_db
         |> Enum.map(fn x ->
           %{
@@ -112,7 +97,7 @@ defmodule EventPlaningWeb.PlanController do
         end)
         |> Enum.min_by(& &1.time_to)
 
-      render(conn, "next_event.html", event: event, next_event: true)
+      render(conn, "next_event.html", plans: next_ev, next_event: true)
     else
       render(conn, "next_event.html", next_event: false)
     end
@@ -123,17 +108,18 @@ defmodule EventPlaningWeb.PlanController do
     |> Repo.all()
     |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
-      %{date: use_repetition(x.date, x.repetition), repetition: x.repetition}
+      %{id: x.id, date: use_repetition(x.date, x.repetition), repetition: x.repetition}
     end)
     |> conflicted_events()
   end
 
-  defp conflicted_events(events) do
-    Enum.map(events, fn y ->
+  defp conflicted_events(plans) do
+    Enum.map(plans, fn y ->
       %{
+        id: y.id,
         date: y.date,
         repetition: y.repetition,
-        count_events: Enum.count(events, fn x -> x.date == y.date end)
+        count_events: Enum.count(plans, fn x -> x.date == y.date end)
       }
     end)
   end

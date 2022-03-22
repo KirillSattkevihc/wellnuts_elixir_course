@@ -43,19 +43,6 @@ defmodule EventPlaningWeb.PlanControllerTest do
     end
   end
 
-  describe "create plan" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.page_path(conn, :login), %{"password" => %{"pass" => @pass}})
-      conn = post(conn, Routes.plan_path(conn, :create), plan: @create_attrs)
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.plan_path(conn, :show, id)
-
-      conn = get(conn, Routes.plan_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Plan"
-    end
-  end
-
   describe "edit plan" do
     setup [:create_plan]
 
@@ -72,7 +59,7 @@ defmodule EventPlaningWeb.PlanControllerTest do
     test "redirects when data is valid", %{conn: conn, plan: plan} do
       conn = post(conn, Routes.page_path(conn, :login), %{"password" => %{"pass" => @pass}})
       conn = put(conn, Routes.plan_path(conn, :update, plan), plan: @update_attrs)
-      assert redirected_to(conn) == Routes.plan_path(conn, :show, plan)
+      assert redirected_to(conn) == Routes.plan_path(conn, :index)
     end
   end
 
@@ -84,10 +71,6 @@ defmodule EventPlaningWeb.PlanControllerTest do
       conn = post(conn, Routes.page_path(conn, :login), %{"password" => %{"pass" => @pass}})
       conn = delete(conn, Routes.plan_path(conn, :delete, plan))
       assert redirected_to(conn) == Routes.plan_path(conn, :index)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.plan_path(conn, :show, plan))
-      end
     end
   end
 

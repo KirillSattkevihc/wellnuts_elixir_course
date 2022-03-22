@@ -55,6 +55,12 @@ defmodule EventPlaning.Events do
     |> Repo.insert()
   end
 
+  def create_plan!(attrs \\ %{}) do
+    %Plan{}
+    |> Plan.changeset(attrs)
+    |> Repo.insert!()
+  end
+
   @doc """
   Updates a plan.
 
@@ -71,6 +77,12 @@ defmodule EventPlaning.Events do
     plan
     |> Plan.changeset(attrs)
     |> Repo.update()
+  end
+
+  def update_plan!(%Plan{} = plan, attrs) do
+    plan
+    |> Plan.changeset(attrs)
+    |> Repo.update!()
   end
 
   @doc """
