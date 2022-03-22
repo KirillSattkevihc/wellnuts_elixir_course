@@ -119,10 +119,8 @@ defmodule EventPlaningWeb.PlanController do
       end)
     |> Enum.reduce(Multi.new(), fn x, acc->
       changeset = Plan.changeset(%Plan{}, x)
-      Multi.insert(acc, {:insert, x}, changeset) end)
-    |> IO.inspect
+      Multi.insert(acc, x, changeset) end)
     |> Repo.transaction()
-   # |> Enum.each(fn x -> Events.create_plan!(x) end)
   end
 
   def my_shedule(conn, %{"repetition" => %{"rep" => rep}} = params) do
