@@ -3,6 +3,7 @@ defmodule EventPlaningWeb.PlanController do
   plug :check_user
   import Ecto.Query
   import Ecto
+  alias Ecto.Multi
   alias EventPlaning.Events
   alias EventPlaning.{Repo, Events.Plan}
 
@@ -65,7 +66,7 @@ defmodule EventPlaningWeb.PlanController do
       nil ->
         conn
         |> put_flash(:info, "Bad plan id.")
-        |> redirect(to: Routes.plan_path(conn, :index))
+        |> redirect(to: Routes.page_path(conn, :index))
     end
   end
 
@@ -84,7 +85,7 @@ defmodule EventPlaningWeb.PlanController do
       nil ->
         conn
         |> put_flash(:info, "Bad  plan id.")
-        |> redirect(to: Routes.plan_path(conn, :index))
+        |> redirect(to: Routes.page_path(conn, :index))
     end
   end
 
@@ -115,8 +116,13 @@ defmodule EventPlaningWeb.PlanController do
     |> ICalendar.from_ics()
     |> Stream.map(fn x ->
       %{name: x.summary, date: x.dtstart, repetition: "year", users_id: user_info.id}
-    end)
-    |> Enum.each(fn x -> Events.create_plan!(x) end)
+      end)
+    |> Enum.reduce(Multi.new(), fn x, acc->
+      changeset = Plan.changeset(%Plan{}, x)
+      Multi.insert(acc, {:insert, x}, changeset) end)
+    |> IO.inspect
+    |> Repo.transaction()
+   # |> Enum.each(fn x -> Events.create_plan!(x) end)
   end
 
   def my_shedule(conn, %{"repetition" => %{"rep" => rep}} = params) do

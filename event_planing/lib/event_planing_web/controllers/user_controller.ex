@@ -74,13 +74,20 @@ defmodule EventPlaningWeb.UserController do
 
   def delete(conn, %{"id" => id}) do
     user = Accounts.get_user(id)
+    authorized_user= conn.assigns[:user_info]
 
-    if Ability.can?(user, :delete, conn.assigns[:user_info]) do
-      {:ok, _user} = Accounts.delete_user(user)
-
-      conn
-      |> put_flash(:info, "User deleted successfully.")
-      |> redirect(to: Routes.user_path(conn, :index))
+    if Ability.can?(user, :delete, authorized_user) do
+      if user.id== authorized_user.id do
+        {:ok, _user} = Accounts.delete_user(user)
+        conn
+        |> configure_session(drop: true)
+        |> redirect(to: Routes.page_path(conn, :login))
+      else
+        {:ok, _user} = Accounts.delete_user(user)
+        conn
+        |> put_flash(:info, "User deleted successfully.")
+        |> redirect(to: Routes.user_path(conn, :index))
+      end
     else
       conn
       |> put_flash(:info, "Your abilities aren't strong")

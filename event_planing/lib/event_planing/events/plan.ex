@@ -4,7 +4,7 @@ defmodule EventPlaning.Events.Plan do
 
   schema "plans" do
     field :name, :string
-    field :date, :utc_datetime_usec
+    field :date, :utc_datetime
     field :repetition, :string, default: "week"
     belongs_to :users, EventPlaning.Accounts.User
 
