@@ -17,8 +17,12 @@ defmodule EventPlaning.Events do
       [%Plan{}, ...]
 
   """
-  def list_plan do
-    Repo.all(Plan)
+  def list_plan(user) do
+    plan = from(m in Plan, where: m.users_id == ^user.id) |> Repo.all()
+  end
+
+  def list_plan() do
+    plan = from(m in Plan) |> Repo.all()
   end
 
   @doc """
@@ -49,12 +53,6 @@ defmodule EventPlaning.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_plan(attrs \\ %{}) do
-    %Plan{}
-    |> Plan.changeset(attrs)
-    |> Repo.insert()
-  end
-
   def create_plan!(attrs \\ %{}) do
     %Plan{}
     |> Plan.changeset(attrs)
@@ -73,16 +71,10 @@ defmodule EventPlaning.Events do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_plan(%Plan{} = plan, attrs) do
-    plan
-    |> Plan.changeset(attrs)
-    |> Repo.update()
-  end
-
   def update_plan!(%Plan{} = plan, attrs) do
     plan
     |> Plan.changeset(attrs)
-    |> Repo.update!()
+    |> Repo.update()
   end
 
   @doc """

@@ -1,5 +1,6 @@
 defmodule EventPlaningWeb.ScheduleChannel do
   use EventPlaningWeb, :channel
+
   import Ecto.Query
   alias EventPlaning.{Repo, Events}
   alias EventPlaning.Events.Plan
@@ -108,7 +109,8 @@ defmodule EventPlaningWeb.ScheduleChannel do
         "year" => data["date_year"]
       },
       "name" => data["name"],
-      "repetition" => data["repetition"]
+      "repetition" => data["repetition"],
+      "users_id" => String.to_integer(data["users_id"])
     }
   end
 

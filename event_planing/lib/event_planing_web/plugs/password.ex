@@ -1,18 +1,25 @@
 defmodule EventPlaningWeb.Plugs.Password do
   import Plug.Conn
 
+  import Ecto.Query
+  alias EventPlaning.{Accounts, Repo, Accounts.User}
+
   def init(_params) do
   end
 
   def call(conn, _params) do
-    user_pass = get_session(conn, :password)
+    u_id = get_session(conn, :user)
 
-    cond do
-      EventPlaningWeb.PageController.check_pass(user_pass) == true ->
-        assign(conn, :password, user_pass)
+    if is_nil(u_id) do
+      assign(conn, :user_info, nil)
+    else
+      case Accounts.get_user(u_id) do
+        %User{} = user ->
+          assign(conn, :user_info, user)
 
-      true ->
-        assign(conn, :password, nil)
+        nil ->
+          assign(conn, :user_info, nil)
+      end
     end
   end
 end

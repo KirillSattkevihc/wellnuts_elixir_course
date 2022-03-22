@@ -37,7 +37,9 @@ if (create_event != null) {
       let { value: date_hour } = document.querySelector('#plan_date_hour')
       let { value: date_minute } = document.querySelector('#plan_date_minute')
       let { value: name } = document.querySelector('#plan_name')
-      channel.push('create', { data: { name, repetition, date_year, date_month, date_day, date_hour, date_minute } })
+      let { value: id } = document.querySelector('#plan_id')
+      let { value: users_id } = document.querySelector('#plan_users_id')
+      channel.push('create', { data: {id , users_id, name, repetition, date_year, date_month, date_day, date_hour, date_minute } })
   })
 }
 
@@ -58,7 +60,8 @@ if (edit_event != null) {
     let { value: date_minute } = document.querySelector('#plan_date_minute')
     let { value: id } = document.querySelector('#plan_id')
     let { value: name } = document.querySelector('#plan_name')
-    channel.push('edit', { data: {name, repetition, date_year, date_month, date_day, date_hour, date_minute, id } })
+    let { value: users_id } = document.querySelector('#plan_users_id')
+    channel.push('edit', { data: {name, users_id, repetition, date_year, date_month, date_day, date_hour, date_minute, id } })
   })
 }
 

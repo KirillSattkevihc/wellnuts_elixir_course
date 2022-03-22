@@ -2,18 +2,14 @@ defmodule EventPlaningWeb.PlanController do
   use EventPlaningWeb, :controller
   plug :check_user
   import Ecto.Query
-  alias EventPlaning.{Repo, Events}
-  alias EventPlaning.Events.Plan
+  import Ecto
+  alias EventPlaning.Events
+  alias EventPlaning.{Repo, Events.Plan}
 
   @day_sec 60 * 60 * 24
 
-  def index(conn, _params) do
-    plan = Events.list_plan()
-    render(conn, "index.html", plan: plan)
-  end
-
   def check_user(conn, _params) do
-    if conn.assigns[:password] do
+    if conn.assigns[:user_info] do
       conn
     else
       conn
@@ -21,6 +17,19 @@ defmodule EventPlaningWeb.PlanController do
       |> redirect(to: Routes.page_path(conn, :entry))
       |> halt()
     end
+  end
+
+  def index(conn, _params) do
+    user = conn.assigns[:user_info]
+
+    plan =
+      if user.role == "admin" do
+        Events.list_plan()
+      else
+        Events.list_plan(user)
+      end
+
+    render(conn, "index.html", plan: plan)
   end
 
   def new(conn, _params) do
@@ -31,63 +40,86 @@ defmodule EventPlaningWeb.PlanController do
   def create(conn, _params) do
     conn
     |> put_flash(:info, "Plan created successfully.")
-    |> redirect(to: Routes.plan_path(conn, :index))
+    |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
   end
 
   def show(conn, %{"id" => id}) do
     case Events.get_plan(id) do
       %Plan{} = plan ->
-        render(conn, "show.html", plan: plan)
+        if Ability.can?(plan, :update, conn.assigns[:user_info]) do
+          render(conn, "show.html", plan: plan)
+        else
+          conn
+          |> put_flash(:info, "Your abilities aren't strong.")
+          |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+        end
 
       nil ->
         conn
-        |> put_flash(:info, "Bad  plan id.")
-        |> redirect(to: Routes.plan_path(conn, :index))
+        |> put_flash(:info, "Bad plan id.")
+        |> redirect(to: Routes.page_path(conn, :index))
     end
   end
 
   def edit(conn, %{"id" => id}) do
     case Events.get_plan(id) do
       %Plan{} = plan ->
-        changeset = Events.change_plan(plan)
-        render(conn, "edit.html", plan: plan, changeset: changeset)
+        if Ability.can?(plan, :update, conn.assigns[:user_info]) do
+          changeset = Events.change_plan(plan)
+          render(conn, "edit.html", plan: plan, changeset: changeset)
+        else
+          conn
+          |> put_flash(:info, "Your abilities aren't strong.")
+          |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+        end
 
       nil ->
         conn
         |> put_flash(:info, "Bad  plan id.")
-        |> redirect(to: Routes.plan_path(conn, :index))
+        |> redirect(to: Routes.page_path(conn, :index))
     end
   end
 
   def update(conn, _params) do
     conn
     |> put_flash(:info, "Plan updated successfully.")
-    |> redirect(to: Routes.plan_path(conn, :index))
+    |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
   end
 
   def delete(conn, %{"id" => id}) do
     plan = Events.get_plan(id)
-    {:ok, _plan} = Events.delete_plan(plan)
 
-    conn
-    |> put_flash(:info, "Plan deleted successfully.")
-    |> redirect(to: Routes.plan_path(conn, :index))
+    if Ability.can?(plan, :delete, conn.assigns[:user_info]) do
+      {:ok, _plan} = Events.delete_plan(plan)
+
+      conn
+      |> put_flash(:info, "Plan deleted successfully.")
+      |> redirect(to: Routes.user_plan_path(conn, :index, :u_id))
+    else
+      conn
+      |> put_flash(:info, "Plan delete crash.")
+      |> redirect(to: Routes.user_plan_path(conn, :index, :user_info))
+    end
   end
 
   def my_shedule(conn, %{"repetition" => %{"rep" => rep}} = params) do
-    plan = check_interval(rep)
+    user_info = conn.assigns[:user_info]
+    plan = check_interval(rep, user_info)
     render(conn, "my_shedule.html", plan: plan)
   end
 
   def my_shedule(conn, _params) do
-    plan = check_interval("week")
+    user_info = conn.assigns[:user_info]
+    plan = check_interval("week", user_info)
     render(conn, "my_shedule.html", plan: plan)
   end
 
   def next_event(conn, _params) do
-    if Enum.any?(check_db()) do
+    user_info = conn.assigns[:user_info]
+
+    if Enum.any?(check_db(user_info)) do
       next_ev =
-        check_db
+        check_db(user_info)
         |> Enum.map(fn x ->
           %{
             name: x.name,
@@ -104,8 +136,8 @@ defmodule EventPlaningWeb.PlanController do
     end
   end
 
-  defp check_db() do
-    from(m in Plan)
+  defp check_db(user_info) do
+    from(m in Plan, where: m.users_id == ^user_info.id)
     |> Repo.all()
     |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
@@ -131,19 +163,19 @@ defmodule EventPlaningWeb.PlanController do
     end)
   end
 
-  defp check_interval("week") do
+  defp check_interval("week", user_info) do
     now = Date.utc_today()
-    check_db() |> Enum.filter(fn x -> Date.diff(Date.end_of_week(now), x.date) >= 0 end)
+    check_db(user_info) |> Enum.filter(fn x -> Date.diff(Date.end_of_week(now), x.date) >= 0 end)
   end
 
-  defp check_interval("month") do
+  defp check_interval("month", user_info) do
     now = Date.utc_today()
-    check_db() |> Enum.filter(fn x -> Date.diff(Date.end_of_month(now), x.date) >= 0 end)
+    check_db(user_info) |> Enum.filter(fn x -> Date.diff(Date.end_of_month(now), x.date) >= 0 end)
   end
 
-  defp check_interval("year") do
+  defp check_interval("year", user_info) do
     last_year_day = Date.new!(Date.utc_today().year + 1, 01, 01)
-    check_db() |> Enum.filter(fn x -> Date.diff(last_year_day, x.date) > 0 end)
+    check_db(user_info) |> Enum.filter(fn x -> Date.diff(last_year_day, x.date) > 0 end)
   end
 
   defp use_repetition(date, "day") do
