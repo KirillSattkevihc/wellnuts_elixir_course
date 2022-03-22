@@ -57,7 +57,7 @@ defmodule EventPlaningWeb.PlanController do
       nil ->
         conn
         |> put_flash(:info, "Bad plan id.")
-        |> redirect(to: Routes.plan_path(conn, :index))
+        |> redirect(to: Routes.page_path(conn, :index))
     end
   end
 
@@ -76,7 +76,7 @@ defmodule EventPlaningWeb.PlanController do
       nil ->
         conn
         |> put_flash(:info, "Bad  plan id.")
-        |> redirect(to: Routes.plan_path(conn, :index))
+        |> redirect(to: Routes.page_path(conn, :index))
     end
   end
 
