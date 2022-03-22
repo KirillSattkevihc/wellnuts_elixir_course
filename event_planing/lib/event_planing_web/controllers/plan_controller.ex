@@ -116,10 +116,11 @@ defmodule EventPlaningWeb.PlanController do
     |> ICalendar.from_ics()
     |> Stream.map(fn x ->
       %{name: x.summary, date: x.dtstart, repetition: "year", users_id: user_info.id}
-      end)
-    |> Enum.reduce(Multi.new(), fn x, acc->
+    end)
+    |> Enum.reduce(Multi.new(), fn x, acc ->
       changeset = Plan.changeset(%Plan{}, x)
-      Multi.insert(acc, x, changeset) end)
+      Multi.insert(acc, x, changeset)
+    end)
     |> Repo.transaction()
   end
 
