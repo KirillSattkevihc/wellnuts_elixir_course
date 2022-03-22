@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>EventPlaning · Phoenix Framework</title>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
     <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
   <body>
 
   <nav>
     <div class="nav-wrapper">
-      <a href="<%= Routes.page_path(@conn, :index)%>" class="brand-logo">Event Planing</a>
+      <a href="<%= Routes.plan_path(@conn, :index)%>" class="brand-logo">Event Planing</a>
+      <a href="<%= Routes.plan_path(@conn, :my_shedule)%>" class="brand-logo">My Shedule</a>
+      <a href="<%= Routes.plan_path(@conn, :next_event)%>" class="brand-logo">Next Event</a>
       <h4 class="right"><%= if @conn.assigns[:password] do %>
       <%= link "logout", to: Routes.page_path(@conn, :logout, class: "btn btn-primary blue") %>
       <% else %>

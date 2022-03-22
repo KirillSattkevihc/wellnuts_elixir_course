@@ -1,0 +1,34 @@
+<h1>My Schedule</h1>
+<%= form_for @conn, Routes.plan_path(@conn, :my_shedule),
+[as: :repetition], fn f-> %>
+
+<%= select f, :rep, [ "week": "week", "month": "month", "year": "year"] %>
+
+<%= submit "select", class: "btn btn-primary blue" %>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Repetition</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for plan <- @plan do %>
+  <%= if plan.count_events > 1 do %>
+    <tr>
+      <td><font color="#D1010B"><%= plan.date %></font></td>
+      <td><font color="#D1010B"><%= plan.repetition %></font></td>
+    </tr>
+  <% else %>
+     <tr>
+      <td><%= plan.date %></td>
+      <td><%= plan.repetition %></td>
+    </tr>
+  <% end %>
+<% end %>
+  </tbody>
+</table>

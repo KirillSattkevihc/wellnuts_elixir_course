@@ -1,0 +1,31 @@
+<h1>Listing Plan</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Repetition</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for plan <- @plan do %>
+    <tr>
+      <td><%= plan.date %></td>
+      <td><%= plan.repetition %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.plan_path(@conn, :show, plan) %></span>
+        <span><%= link "Edit", to: Routes.plan_path(@conn, :edit, plan) %></span>
+
+        <span><%= link "Delete", to: Routes.plan_path(@conn, :delete, plan), method: :delete, data: [confirm: "Are you sure?"] %></span>
+
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Plan", to: Routes.plan_path(@conn, :new) %></span>
+<span><%= link "Next Event", to: Routes.plan_path(@conn, :next_event) %></span>
+<span><%= link "My shedule", to: Routes.plan_path(@conn, :my_shedule) %></span>
