@@ -90,6 +90,7 @@ defmodule EventPlaningWeb.PlanController do
         check_db
         |> Enum.map(fn x ->
           %{
+            name: x.name,
             date: x.date,
             repetition: x.repetition,
             time_to: DateTime.diff(x.date, DateTime.utc_now())
@@ -108,7 +109,12 @@ defmodule EventPlaningWeb.PlanController do
     |> Repo.all()
     |> Enum.reject(fn x -> x.repetition == "none" and x.date < DateTime.now!("Etc/UTC") end)
     |> Enum.map(fn x ->
-      %{id: x.id, date: use_repetition(x.date, x.repetition), repetition: x.repetition}
+      %{
+        name: x.name,
+        id: x.id,
+        date: use_repetition(x.date, x.repetition),
+        repetition: x.repetition
+      }
     end)
     |> conflicted_events()
   end
@@ -116,6 +122,7 @@ defmodule EventPlaningWeb.PlanController do
   defp conflicted_events(plans) do
     Enum.map(plans, fn y ->
       %{
+        name: y.name,
         id: y.id,
         date: y.date,
         repetition: y.repetition,

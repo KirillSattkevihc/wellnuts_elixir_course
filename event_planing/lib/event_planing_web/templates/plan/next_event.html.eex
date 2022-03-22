@@ -3,6 +3,7 @@
 <%= if @next_event == true  do %>
   <thead>
     <tr>
+      <th>Name</th>
       <th>Date</th>
       <th>Repetition</th>
       <th>Time to </th>
@@ -12,6 +13,7 @@
   </thead>
   <tbody>
     <tr>
+      <td><%= @plans.name %>
       <td><%= @plans.date %></td>
       <td><%= @plans.repetition %></td>
       <td><%= day= trunc(@plans.time_to /(24*60*60))   %> days</td>

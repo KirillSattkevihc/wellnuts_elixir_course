@@ -63,7 +63,6 @@ defmodule EventPlaningWeb.PlanControllerTest do
     end
   end
 
-  # ?
   describe "delete plan" do
     setup [:create_plan]
 

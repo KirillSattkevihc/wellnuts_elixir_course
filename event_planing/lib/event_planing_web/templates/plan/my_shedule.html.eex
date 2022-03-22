@@ -10,6 +10,7 @@
 <table>
   <thead>
     <tr>
+      <th>Name </th>
       <th>Date</th>
       <th>Repetition</th>
       <th></th>
@@ -19,11 +20,13 @@
 <%= for plan <- @plan do %>
   <%= if plan.count_events > 1 do %>
       <%= content_tag :tr, id: plan.id do %>
+      <td><font color="red"><%= plan.name %></font></td>
       <td><font color="red"><%= plan.date %></font></td>
       <td><font color="red"><%= plan.repetition %></font></td>
       <% end %>
   <% else %>
       <%= content_tag :tr, id: plan.id do %>
+      <td><%= plan.name %></td>
       <td><%= plan.date %></td>
       <td><%= plan.repetition %></td>
       <% end %>

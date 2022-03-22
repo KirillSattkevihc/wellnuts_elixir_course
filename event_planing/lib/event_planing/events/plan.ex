@@ -3,6 +3,7 @@ defmodule EventPlaning.Events.Plan do
   import Ecto.Changeset
 
   schema "plans" do
+    field :name, :string
     field :date, :utc_datetime_usec
     field :repetition, :string, default: "week"
 
@@ -12,8 +13,8 @@ defmodule EventPlaning.Events.Plan do
   @doc false
   def changeset(plans, attrs) do
     plans
-    |> cast(attrs, [:date, :repetition])
-    |> validate_required([:date, :repetition])
+    |> cast(attrs, [:name, :date, :repetition])
+    |> validate_required([:name, :date, :repetition])
     |> validate_inclusion(:repetition, ["day", "week", "month", "year", "none"])
   end
 end
